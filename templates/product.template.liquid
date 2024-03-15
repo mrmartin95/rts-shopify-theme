@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{ product.title }}</title>
+  </head>
+  <body>
+    <article>
+      <header>
+        <h1>{{ product.title }}</h1>
+        <span id="product-price">{{ product.price | money_with_currency }}</span>
+      </header>
+
+      <section>
+        <form action="/cart/add" method="post" enctype="multipart/form-data">
+          {% for variant in product.variants %}
+            <input
+              type="radio"
+              name="id"
+              value="{{ variant.id }}"
+              {% if forloop.first %}
+                checked
+              {% endif %}
+            >
+            {{ variant.title }} - {{ variant.price | money_with_currency }}
+          {% endfor %}
+
+          <label for="custom-length">Lengtemaat:</label>
+          <input type="number" id="custom-length" name="properties[Lengtemaat]" min="1">
+
+          <input type="submit" value="Add to cart">
+        </form>
+      </section>
+
+      <script>
+        document.getElementById('custom-length').addEventListener('change', function() {
+          var basePrice = {{ product.price | money_without_currency }};
+          var enteredLength = this.value;
+          var newPrice = basePrice * Math.pow(1, enteredLength);
+
+          document.getElementById('product-price').innerText = newPrice.toFixed(2);
+        });
+      </script>
+    </article>
+  </body>
+</html>
