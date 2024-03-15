@@ -1,0 +1,14 @@
+<label for="custom-length">Lengtemaat:</label>
+<input type="number" id="custom-length" name="properties[Lengtemaat]">
+
+<script>
+  // Wanneer de waarde van het invoerveld verandert
+  document.getElementById('custom-length').addEventListener('change', function() {
+    var basePrice = {{ product.price | money_without_currency }}; // Standaardprijs van het product
+    var enteredLength = this.value; // Ingevoerde lengtemaat door de klant
+    var newPrice = basePrice * Math.pow(1, enteredLength); // Bereken de nieuwe prijs
+
+    // Update de prijs op de pagina
+    document.getElementById('product-price').innerText = newPrice.toFixed(2);
+  });
+</script>
