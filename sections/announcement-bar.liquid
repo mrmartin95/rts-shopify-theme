@@ -4,7 +4,7 @@
 }
 {%- endcapture -%}
 
-<section data-section-id="{{ section.id }}" data-section-type="announcement-bar" data-section-settings='{{ section_settings }}'>
+<section data-section-id="{{ section.id }}" data-section-type="announcement-bar" data-section-settings="{{ section_settings | escape_once }}">
   {%- if section.settings.show_newsletter -%}
     <div id="announcement-bar-newsletter" class="announcement-bar__newsletter hidden-phone" aria-hidden="true">
       <div class="container">

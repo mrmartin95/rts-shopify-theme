@@ -137,7 +137,7 @@
                       {%- render 'icon', icon: 'arrow-bottom' -%}
                     </button>
 
-                    <div id="footer-currency-picker" class="value-picker value-picker--auto value-picker--small" data-picker-position="top" aria-hidden="true">
+                    <div id="footer-currency-picker" class="value-picker value-picker--align-left value-picker--auto value-picker--small" data-picker-position="top" aria-hidden="true">
                       {% render 'icon', icon: 'nav-triangle-borderless' %}
 
                       <div class="value-picker__inner value-picker__inner--restrict">
@@ -184,7 +184,6 @@
             {%- endif -%}
           </div>
         {%- endif -%}
-<a href="https://www.webwinkelkeur.nl/webshop/Rooftopshop_1215621" class="webwinkelkeurPopup" title="Webwinkel Keurmerk" target="_blank"><img src="https://dashboard.webwinkelkeur.nl/banners/10/1215621/1652997600.svg" width="468" height="60" alt="Webwinkel Keurmerk"></a>
 
         {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
           <div class="footer__aside-item footer__aside-item--payment">

@@ -1,0 +1,70 @@
+<section class="section section--text-centered" data-section-id="{{ section.id }}" data-section-type="rich-text-multi">
+  <div class="container">
+    {%- if section.settings.title != blank -%}
+      <h2 class="heading h1">{{ section.settings.title | escape }}</h2>
+    {%- endif -%}
+
+    <div class="rich-text-columns" style="display: flex; gap: 20px; flex-wrap: wrap;">
+      {%- for block in section.blocks -%}
+        <div class="rich-text-column" style="flex: 1 1 calc(33.33% - 20px);">
+          <div class="rte">
+            {{ block.settings.content }}
+
+            {%- if block.settings.button_link != blank and block.settings.button_text != blank -%}
+              <a href="{{ block.settings.button_link }}" class="button button--primary">
+                {{- block.settings.button_text | escape -}}
+              </a>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Rich Text Multi",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Your title"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "rich_text",
+      "name": "Rich Text Block",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Text",
+          "default": "<p>Use this text to share information about your brand with your customers.<br>Describe a product, share announcements, or welcome customers to your store.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link",
+          "default": "/collections/all"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "category": "Text",
+      "name": "Rich Text Multi",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}

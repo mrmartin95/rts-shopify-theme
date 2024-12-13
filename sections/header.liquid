@@ -12,7 +12,7 @@
 {%- assign navigation_mobile_menu_handle = section.settings.navigation_mobile_menu | default: navigation_menu_handle -%}
 {%- assign navigation_mobile_menu = linklists[navigation_mobile_menu_handle] -%}
 
-<section data-section-id="{{ section.id }}" data-section-type="header" data-section-settings='{{ section_settings }}'>
+<section data-section-id="{{ section.id }}" data-section-type="header" data-section-settings="{{ section_settings | escape_once }}">
   <header class="header header--{{ section.settings.desktop_navigation_layout }} {% unless section.settings.show_condensed_search %}header--search-expanded{% endunless %}" role="banner">
     <div class="container">
       <div class="header__inner">
@@ -225,8 +225,8 @@
                       </ul>
                     </div>
                   </div>
-                {%- endform -%}
-              </div>
+                </div>
+              {%- endform -%}
             </div>
           {%- endif -%}
 
@@ -256,8 +256,8 @@
                       </ul>
                     </div>
                   </div>
-                {%- endform -%}
-              </div>
+                </div>
+              {%- endform -%}
             </div>
           {%- endif -%}
 
@@ -276,11 +276,11 @@
               {%- endif -%}
 
               <div class="header__action-item-content">
-                <a href="{{ routes.account_url }}" class="header__action-item-link header__account-icon icon-state hidden-desk" aria-label="{{ 'header.general.account' | t }}">
+                <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__action-item-link header__account-icon icon-state hidden-desk" aria-label="{{ 'header.general.account' | t }}">
                   <span class="icon-state__primary">{%- render 'icon', icon: 'account' -%}</span>
                 </a>
 
-                <a href="{{ routes.account_url }}" class="header__action-item-link hidden-pocket hidden-lap">
+                <a href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}" class="header__action-item-link hidden-pocket hidden-lap">
                   {{- 'header.general.account' | t -}}
                 </a>
               </div>
@@ -334,8 +334,6 @@
                 {%- endif -%}
               </li>
             {%- endfor -%}
-
-            	<a href="https://www.webwinkelkeur.nl/webshop/Rooftopshop_1215621" class="webwinkelkeurPopup" title="Webwinkel Keurmerk en klantbeoordelingen" target="_blank"><img src="https://dashboard.webwinkelkeur.nl/banners/70/1215621/1652997600.svg" width="90" height="34" alt="Webwinkel Keurmerk en klantbeoordelingen"></a>	
           </ul>
         </div>
       </div>
@@ -351,6 +349,7 @@
 
   #shopify-section-{{ section.id }} {
     position: relative;
+    display: flow-root;
     z-index: 5;
 
     {%- if section.settings.enable_sticky_header -%}
@@ -542,7 +541,7 @@
       "id": "show_search_filter",
       "label": "Show search filter",
       "default": true,
-      "info": "Refine by product type. [Learn more](https://support.maestrooo.com/article/184-navigation-filtering-search-results-by-product-type)"
+      "info": "Refine by product type. [Learn more](https://help.shopify.com/en/manual/products/details/product-type#add-a-custom-product-type)"
     },
     {
       "type": "link_list",

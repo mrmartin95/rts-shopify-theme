@@ -1,5 +1,5 @@
 <div class="container container--flush container--narrow">
-  <div class="faq" {% if disabled_by_yoast_seo %}itemscope{% endif %} {% if disabled_by_yoast_seo %}itemtype="https://schema.org/FAQPage"{% endif %}>
+  <div class="faq" itemscope itemtype="https://schema.org/FAQPage">
     <div class="faq__group-list">
       {%- for block in section.blocks -%}
         {%- if forloop.first or block.type == 'separator' -%}
@@ -8,17 +8,17 @@
 
         {%- case block.type -%}
           {%- when 'separator' -%}
-            <h2 class="faq__group-title heading h2" {{ block.shopify_attributes }}>
+            <h1 class="faq__group-title heading h2" {{ block.shopify_attributes }}>
               <span class="anchor" id="block-{{ block.id }}"></span>
               {{- block.settings.title | escape -}}
-            </h2>
+            </h1>
           {%- when 'question' -%}
-            <div class="faq__item" {% if disabled_by_yoast_seo %}itemscope{% endif %} {% if disabled_by_yoast_seo %}itemprop="mainEntity"{% endif %} {% if disabled_by_yoast_seo %}itemtype="https://schema.org/Question"{% endif %} {{ block.shopify_attributes }}>
+            <div class="faq__item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" {{ block.shopify_attributes }}>
               <div class="faq__item-wrapper">
-                <button class="faq__question heading h4" data-action="toggle-collapsible" aria-expanded="false" aria-controls="block-{{ block.id }}" {% if disabled_by_yoast_seo %}itemprop="name"{% endif %}>{{ block.settings.title | escape }} <span class="plus-button plus-button--large"></span></button>
+                <button class="faq__question heading h4" data-action="toggle-collapsible" aria-expanded="false" aria-controls="block-{{ block.id }}" itemprop="name">{{ block.settings.title | escape }} <span class="plus-button plus-button--large"></span></button>
 
-                <div id="block-{{ block.id }}" class="faq__answer-wrapper" {% if disabled_by_yoast_seo %}itemscope{% endif %} {% if disabled_by_yoast_seo %}itemprop="acceptedAnswer"{% endif %} {% if disabled_by_yoast_seo %}itemtype="https://schema.org/Answer"{% endif %}>
-                  <div class="faq__answer rte" {% if disabled_by_yoast_seo %}itemprop="text"{% endif %}>
+                <div id="block-{{ block.id }}" class="faq__answer-wrapper" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                  <div class="faq__answer rte" itemprop="text">
                     {{ block.settings.answer }}
                   </div>
                 </div>

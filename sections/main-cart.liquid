@@ -1,10 +1,10 @@
 {%- capture section_settings -%}
 {
-  "showShippingEstimator": {% if cart.item_count == 0 %}false{% else %}{{ section.settings.show_shipping_estimator | json }}{% endif %}
+  "showShippingEstimator": {% if cart.item_count == 0 or cart.requires_shipping == false %}false{% else %}{{ section.settings.show_shipping_estimator | json }}{% endif %}
 }
 {%- endcapture -%}
 
-<section data-section-id="{{ section.id }}" data-section-type="cart" data-section-settings='{{ section_settings }}' data-item-count="{{ cart.item_count }}">
+<section data-section-id="{{ section.id }}" data-section-type="cart" data-section-settings="{{ section_settings | escape_once }}" data-item-count="{{ cart.item_count }}">
   {%- if cart.item_count == 0 -%}
     <div class="container">
       <div class="empty-state">
@@ -16,7 +16,7 @@
 
         {%- if settings.cart_show_free_shipping_threshold -%}
           {%- assign threshold_in_cents = settings.cart_free_shipping_threshold | times: 100 -%}
-          {%- capture remaining_amount -%}<span data-hulkapps-cart-total ><span  class='ymq_cart_total_price'>{{ cart.total_price | minus: threshold_in_cents | abs | money }}</span></span>{%- endcapture -%}
+          {%- capture remaining_amount -%}<span>{{ cart.total_price | minus: threshold_in_cents | abs | money }}</span>{%- endcapture -%}
           <p class="empty-state__description">{{ 'cart.general.free_shipping_remaining_html' | t: remaining_amount: remaining_amount }}</p>
         {%- endif -%}
 
@@ -36,7 +36,7 @@
           {%- if cart.total_price >= threshold_in_cents -%}
             <p class="page__description">{{ 'cart.general.free_shipping' | t }}</p>
           {%- else -%}
-            {%- capture remaining_amount -%}<span data-hulkapps-cart-total ><span  class='ymq_cart_total_price'>{{ cart.total_price | minus: threshold_in_cents | abs | money }}</span></span>{%- endcapture -%}
+            {%- capture remaining_amount -%}<span>{{ cart.total_price | minus: threshold_in_cents | abs | money }}</span>{%- endcapture -%}
             <p class="page__description">{{ 'cart.general.free_shipping_remaining_html' | t: remaining_amount: remaining_amount }}</p>
           {%- endif -%}
         {%- endif -%}
@@ -68,7 +68,7 @@
                     {%- assign gift_wrap_product = section.settings.gift_wrap_product -%}
 
                     {%- for line_item in cart.items -%}
-                      <tr  data-hulkapps-lineitem class="line-item line-item--stack">
+                      <tr class="line-item line-item--stack">
                         <td class="line-item__product-info">
                           <div class="line-item__product-info-wrapper">
                             <div class="line-item__image-wrapper">
@@ -108,7 +108,7 @@
                               {%- endif -%}
 
                               {%- unless line_item.properties == blank -%}
-                                <ul  data-hulkapps-line-properties  data-hulkapps-line-properties  data-hulkapps-line-properties  data-hulkapps-line-properties  data-hulkapps-line-properties class="line-item__property-list" role="list">
+                                <ul class="line-item__property-list" role="list">
                                   {%- for property in line_item.properties -%}
                                     {%- assign first_character_in_key = property.first | truncate: 1, '' -%}
 
@@ -119,11 +119,6 @@
                                     <li class="line-item__property">{{ property.first }}: {{ property.last }}</li>
                                   {%- endfor -%}
                                 </ul>
-<button type='button' style='display: none;' class='edit_cart_option btn btn--primary button' data-product_id='{{line_item.product_id}}' data-key='{{line_item.key}}' data-variant_id='{{line_item.variant_id}}' data-quantity='{{line_item.quantity}}'>Edit Options</button>
-
-
-
-
                               {%- endunless -%}
 
                               <div class="line-item__price-list">
@@ -131,15 +126,15 @@
                                   {%- if line_item.final_price == 0 -%}
                                     <span class="line-item__price line-item__price--highlight">{{ 'cart.general.free' | t }}</span>
                                   {%- else -%}
-                                    <span  data-hulkapps-ci-price data-key='{{line_item.key}}' class="line-item__price line-item__price--highlight"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_final_price'>{{ line_item.final_price | money }}</span></span>
+                                    <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
                                   {%- endif -%}
 
-                                  <span  data-hulkapps-ci-price data-key='{{line_item.key}}' class="line-item__price line-item__price--compare"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_original_price'>{{ line_item.original_price | money }}</span></span>
+                                  <span class="line-item__price line-item__price--compare">{{ line_item.original_price | money }}</span>
                                 {%- elsif line_item.variant.compare_at_price > line_item.variant.price -%}
                                   {%- if line_item.final_price == 0 -%}
                                     <span class="line-item__price line-item__price--highlight">{{ 'cart.general.free' | t }}</span>
                                   {%- else -%}
-                                    <span  data-hulkapps-ci-price data-key='{{line_item.key}}' class="line-item__price line-item__price--highlight"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_final_price'>{{ line_item.final_price | money }}</span></span>
+                                    <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
                                   {%- endif -%}
 
                                   <span class="line-item__price line-item__price--compare">{{ line_item.variant.compare_at_price | money }}</span>
@@ -147,7 +142,7 @@
                                   {%- if line_item.final_price == 0 -%}
                                     <span class="line-item__price">{{ 'cart.general.free' | t }}</span>
                                   {%- else -%}
-                                    <span  data-hulkapps-ci-price data-key='{{line_item.key}}' class="line-item__price"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_final_price'>{{ line_item.final_price | money }}</span></span>
+                                    <span class="line-item__price">{{ line_item.final_price | money }}</span>
                                   {%- endif -%}
                                 {%- endif -%}
                               </div>
@@ -155,14 +150,14 @@
                               {%- if line_item.unit_price_measurement -%}
                                 <div class="line-item__price-info">
                                   <div class="unit-price-measurement">
-                                    <span class="unit-price-measurement__price"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_unit_price'>{{ line_item.unit_price | money }}</span></span>
+                                    <span class="unit-price-measurement__price">{{ line_item.unit_price | money }}</span>
                                     <span class="unit-price-measurement__separator">/ </span>
 
                                     {%- if line_item.unit_price_measurement.reference_value != 1 -%}
-                                      <span class="unit-price-measurement__reference-value"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_unit_price_measurement'>{{ line_item.unit_price_measurement.reference_value }}</span></span>
+                                      <span class="unit-price-measurement__reference-value">{{ line_item.unit_price_measurement.reference_value }}</span>
                                     {%- endif -%}
 
-                                    <span class="unit-price-measurement__reference-unit"><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_unit_price_measurement'>{{ line_item.unit_price_measurement.reference_unit }}</span></span>
+                                    <span class="unit-price-measurement__reference-unit">{{ line_item.unit_price_measurement.reference_unit }}</span>
                                   </div>
                                 </div>
                               {%- endif -%}
@@ -182,15 +177,29 @@
 
                                 {%- unless line_item.product.tags contains '__gift' -%}
                                   <div class="quantity-selector">
-                                    {%- assign allow_to_add_more = true -%}
+                                    {% liquid
+                                      assign max_quantity = ''
+                                      assign variant = line_item.variant
+                                
+                                      if variant.inventory_management != blank and variant.inventory_policy == 'deny'
+                                        assign current_quantity_for_variant = cart | item_count_for_variant: variant.id
+                                        assign max_quantity = variant.inventory_quantity | minus: current_quantity_for_variant | plus: line_item.quantity
+                                      endif
+                                
+                                      if variant.quantity_rule.max != nil
+                                        assign max_quantity = max_quantity | default: 999999 | at_most: variant.quantity_rule.max
+                                      endif
+              
+                                      assign increment = line_item.quantity | plus: line_item.variant.quantity_rule.increment
+              
+                                      if line_item.variant.quantity_rule.max != nil
+                                        assign increment = increment | at_most: line_item.variant.quantity_rule.max
+                                      endif
+                                    %}
 
-                                    {%- if line_item.variant.inventory_management and line_item.variant.inventory_policy == 'deny' and line_item.quantity == line_item.variant.inventory_quantity -%}
-                                      {%- assign allow_to_add_more = false -%}
-                                    {%- endif -%}
-
-                                    <button type="button" class="quantity-selector__button" data-action="decrease-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | minus: 1 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | minus: 1 }}" data-line="{{ forloop.index }}" aria-label="{{ 'cart.items.decrease_quantity' | t }}" title="{{ 'cart.items.decrease_quantity' | t }}">{% render 'icon', icon: 'minus' %}</button>
-                                    <input aria-label="{{ 'product.form.quantity' | t }}" class="quantity-selector__value" inputmode="numeric" data-current-value="{{ line_item.quantity }}" data-line="{{ forloop.index }}" value="{{ line_item.quantity }}" size="{{ line_item.quantity | append: '' | size | at_least: 2 }}">
-                                    <button type="button" class="quantity-selector__button" data-action="increase-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | plus: 1 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | plus: 1 }}" data-line="{{ forloop.index }}" {% if allow_to_add_more %}aria-label="{{ 'cart.items.increase_quantity' | t }}" title="{{ 'cart.items.increase_quantity' | t }}"{% else %}disabled="disabled" aria-label="{{ 'cart.items.no_more_stock' | t }}" data-tooltip="{{ 'cart.items.no_more_stock' | t }}" data-tooltip-position="bottom-left"{% endif %}>{% render 'icon', icon: 'plus' %}</button>
+                                    <button type="button" class="quantity-selector__button" data-action="decrease-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | minus: line_item.variant.quantity_rule.increment | at_least: 0 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | minus: line_item.variant.quantity_rule.increment | at_least: 0 }}" data-line="{{ forloop.index }}" aria-label="{{ 'cart.items.decrease_quantity' | t }}" title="{{ 'cart.items.decrease_quantity' | t }}">{% render 'icon', icon: 'minus' %}</button>
+                                    <input aria-label="{{ 'product.form.quantity' | t }}" type="number" class="quantity-selector__value" inputmode="numeric" data-current-value="{{ line_item.quantity }}" data-line="{{ forloop.index }}" value="{{ line_item.quantity }}" step="{{ line_item.variant.quantity_rule.increment }}" min="{{ line_item.variant.quantity_rule.min }}" {% if line_item.variant.quantity_rule.max != nil %}max="{{ line_item.variant.quantity_rule.max }}"{% endif %}>
+                                    <button type="button" class="quantity-selector__button" data-action="increase-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ increment }}&line={{ forloop.index }}" data-quantity="{{ increment }}" data-line="{{ forloop.index }}" {% if max_quantity == blank or line_item.quantity < max_quantity %}aria-label="{{ 'cart.items.increase_quantity' | t }}" title="{{ 'cart.items.increase_quantity' | t }}"{% else %}disabled="disabled" aria-label="{{ 'cart.items.no_more_stock' | t }}" data-tooltip="{{ 'cart.items.no_more_stock' | t }}" data-tooltip-position="bottom-left"{% endif %}>{% render 'icon', icon: 'plus' %}</button>
                                   </div>
                                 {%- else -%}
                                   <span>{{ line_item.quantity }}</span>
@@ -207,15 +216,29 @@
 
                           {%- unless line_item.product.tags contains '__gift' -%}
                             <div class="quantity-selector">
-                              {%- assign allow_to_add_more = true -%}
+                              {% liquid
+                                assign max_quantity = ''
+                                assign variant = line_item.variant
+                          
+                                if variant.inventory_management != blank and variant.inventory_policy == 'deny'
+                                  assign current_quantity_for_variant = cart | item_count_for_variant: variant.id
+                                  assign max_quantity = variant.inventory_quantity | minus: current_quantity_for_variant | plus: line_item.quantity
+                                endif
+                          
+                                if variant.quantity_rule.max != nil
+                                  assign max_quantity = max_quantity | default: 999999 | at_most: variant.quantity_rule.max
+                                endif
+        
+                                assign increment = line_item.quantity | plus: line_item.variant.quantity_rule.increment
+        
+                                if line_item.variant.quantity_rule.max != nil
+                                  assign increment = increment | at_most: line_item.variant.quantity_rule.max
+                                endif
+                              %}
 
-                              {%- if line_item.variant.inventory_management and line_item.variant.inventory_policy == 'deny' and line_item.quantity == line_item.variant.inventory_quantity -%}
-                                {%- assign allow_to_add_more = false -%}
-                              {%- endif -%}
-
-                              <button type="button" class="quantity-selector__button" data-action="decrease-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | minus: 1 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | minus: 1 }}" data-line="{{ forloop.index }}" aria-label="{{ 'cart.items.decrease_quantity' | t }}" title="{{ 'cart.items.decrease_quantity' | t }}">{% render 'icon', icon: 'minus' %}</button>
-                              <input aria-label="{{ 'product.form.quantity' | t }}" class="quantity-selector__value" inputmode="numeric" data-current-value="{{ line_item.quantity }}" data-line="{{ forloop.index }}" value="{{ line_item.quantity }}" size="{{ line_item.quantity | append: '' | size | at_least: 2 }}">
-                              <button type="button" class="quantity-selector__button" data-action="increase-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | plus: 1 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | plus: 1 }}" data-line="{{ forloop.index }}" {% if allow_to_add_more %}aria-label="{{ 'cart.items.increase_quantity' | t }}" title="{{ 'cart.items.increase_quantity' | t }}"{% else %}disabled="disabled" aria-label="{{ 'cart.items.no_more_stock' | t }}" data-tooltip="{{ 'cart.items.no_more_stock' | t }}" data-tooltip-position="bottom-left"{% endif %}>{% render 'icon', icon: 'plus' %}</button>
+                              <button type="button" class="quantity-selector__button" data-action="decrease-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ line_item.quantity | minus: line_item.variant.quantity_rule.increment | at_least: 0 }}&line={{ forloop.index }}" data-quantity="{{ line_item.quantity | minus: line_item.variant.quantity_rule.increment | at_least: 0 }}" data-line="{{ forloop.index }}" aria-label="{{ 'cart.items.decrease_quantity' | t }}" title="{{ 'cart.items.decrease_quantity' | t }}">{% render 'icon', icon: 'minus' %}</button>
+                              <input aria-label="{{ 'product.form.quantity' | t }}" type="number" class="quantity-selector__value" inputmode="numeric" data-current-value="{{ line_item.quantity }}" data-line="{{ forloop.index }}" value="{{ line_item.quantity }}" step="{{ line_item.variant.quantity_rule.increment }}" min="{{ line_item.variant.quantity_rule.min }}" {% if line_item.variant.quantity_rule.max != nil %}max="{{ line_item.variant.quantity_rule.max }}"{% endif %}>
+                              <button type="button" class="quantity-selector__button" data-action="increase-quantity" data-href="{{ routes.cart_change_url }}?quantity={{ increment }}&line={{ forloop.index }}" data-quantity="{{ increment }}" data-line="{{ forloop.index }}" {% if max_quantity == blank or line_item.quantity < max_quantity %}aria-label="{{ 'cart.items.increase_quantity' | t }}" title="{{ 'cart.items.increase_quantity' | t }}"{% else %}disabled="disabled" aria-label="{{ 'cart.items.no_more_stock' | t }}" data-tooltip="{{ 'cart.items.no_more_stock' | t }}" data-tooltip-position="bottom-left"{% endif %}>{% render 'icon', icon: 'plus' %}</button>
                             </div>
                           {%- else -%}
                             <span>{{ line_item.quantity }}</span>
@@ -228,7 +251,7 @@
                           {%- if line_item.final_line_price == 0 -%}
                             {{- 'cart.general.free' | t -}}
                           {%- else -%}
-                            <span data-hulkapps-line-price data-key='{{line_item.key}}' ><span data-ymq-item-key="{{ line_item.key }}" class='ymq_item_final_line_price'>{{ line_item.final_line_price | money }}</span></span>
+                            <span>{{ line_item.final_line_price | money }}</span>
                           {%- endif -%}
                         </td>
                       </tr>
@@ -270,7 +293,7 @@
                         {%- if gift_wrap_product.price == 0 -%}
                           <span>{{ 'cart.general.free' | t }}</span>
                         {%- else -%}
-                          {%- capture gift_wrap_product_price -%}<span><span data-ymq-item-key="{{ product.key }}" class='ymq_item_price'>{{ gift_wrap_product.price | money }}</span></span>{%- endcapture -%}
+                          {%- capture gift_wrap_product_price -%}<span>{{ gift_wrap_product.price | money }}</span>{%- endcapture -%}
                           <span>{{ 'cart.gift_wrap.price_html' | t: price: gift_wrap_product_price }}</span>
                         {%- endif -%}
                       </p>
@@ -369,7 +392,7 @@
 
                     <div class="cart-recap__price-line text--pull">
                       <span class="cart-recap__price-line-label">{{ 'cart.general.total' | t }}</span>
-                      <span  data-hulkapps-cart-total class="cart-recap__price-line-price"><span  class='ymq_cart_total_price'>{{ cart.total_price | money_with_currency }}</span></span>
+                      <span class="cart-recap__price-line-price">{{ cart.total_price | money_with_currency }}</span>
                     </div>
 
                     {%- comment -%}
@@ -538,7 +561,7 @@
                   }
                   {%- endcapture -%}
 
-                  <div class="section" data-section-id="{{ section.id }}-upsell" data-section-type="featured-collection" data-section-settings='{{ section_settings }}'>
+                  <div class="section" data-section-id="{{ section.id }}-upsell" data-section-type="featured-collection" data-section-settings="{{ section_settings | escape_once }}">
                     <header class="section__header">
                       <h2 class="section__title heading h3">{{ section.settings.upsell_heading | escape }}</h2>
                     </header>
@@ -604,7 +627,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Gift wrap needs to be set up as a product. [Read more](https://support.maestrooo.com/article/190-cart-set-up-a-gift-wrap-product)"
+      "content": "Gift wrap needs to be set up as a product."
     },
     {
       "type": "product",
@@ -841,4 +864,4 @@
     }
   ]
 }
-{% endschema %}{% comment %}<!-- ymq option done -->{% endcomment %}
+{% endschema %}
